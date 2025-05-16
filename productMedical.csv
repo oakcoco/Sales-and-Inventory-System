@@ -1,1 +1,1 @@
-itemId	productName	quantity	soldBy	floorQuantity	dateAdded	pricePerPcs
+itemId,productName,quantity,soldBy,floorQuantity,dateAdded,pricePerPcs
