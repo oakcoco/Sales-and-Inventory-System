@@ -6,5 +6,7 @@ My first program defining how a Sales & Inventory System works using a CSV file.
 I'd like to remind everyone who will see this project. It's just a mock program of how should a sales and inventory system works in real world. 
 I don't recommend and promote unethical logics of code in real world platform. As i said this is just a mimic project to play fun with.
 
-Play with mistakes. Apply the Lessons.
+Play with errors and mistakes. Apply the Lessons.
+
+I would like to credit my groupmates who helped me develop and present the project in the university.
 
