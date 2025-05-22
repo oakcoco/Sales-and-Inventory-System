@@ -495,56 +495,56 @@ void addSalesRecord()
 		}
 	}
 
-		ifstream filenameBRUH(filename.c_str());
-	
-		cin.ignore();
-		cout << "Enter Product Name or Product ID: ";
-		getline(cin, productName);
-		
-		customerNameTrue = true;
-		// hey your bool is reseted to true!!!^^^^^
-		
-		while (getline(filenameBRUH, line))
-		{
-			stringstream ss(line);
-			string id, name, quantity, soldBy, floorQuantity, dateAdded, productPrice;
-	
-			getline(ss, id, ',');
-			getline(ss, name, ',');
-			getline(ss, quantity, ',');
-			getline(ss, soldBy, ',');
-			getline(ss, floorQuantity, ',');
-			getline(ss, dateAdded, ',');
-			getline(ss, productPrice, ',');
-			
-			if (productName == id || productName == name)
-			{
-				productName = name;
-				productID = id;
-				
-				stringstream temp(productPrice);
-				temp >> productPriceMain;
+	ifstream filenameBRUH(filename.c_str());
 
-				customerNameTrue = false;
-				break;
-			}
-		}
-		if (customerNameTrue)
+	cin.ignore();
+	cout << "Enter Product Name or Product ID: ";
+	getline(cin, productName);
+
+	customerNameTrue = true;
+	// hey your bool is reseted to true!!!^^^^^
+
+	while (getline(filenameBRUH, line))
+	{
+		stringstream ss(line);
+		string id, name, quantity, soldBy, floorQuantity, dateAdded, productPrice;
+
+		getline(ss, id, ',');
+		getline(ss, name, ',');
+		getline(ss, quantity, ',');
+		getline(ss, soldBy, ',');
+		getline(ss, floorQuantity, ',');
+		getline(ss, dateAdded, ',');
+		getline(ss, productPrice, ',');
+
+		if (productName == id || productName == name)
 		{
-			cout << "Not Found In Database. Please Try Again." << endl;
-			customersData.close();
-			return;
+			productName = name;
+			productID = id;
+
+			stringstream temp(productPrice);
+			temp >> productPriceMain;
+
+			customerNameTrue = false;
+			break;
 		}
-		cout << "Quantity Bought: ";
-		cin >> qtyBought;
-	//process total
-		double total;
-		total = qtyBought * (productPriceMain + (productPriceMain * 0.20));
-		
-	filenameBRUH.close();		
-	
-	//relocation. update value of quantity because you sold an item
-	
+	}
+	if (customerNameTrue)
+	{
+		cout << "Not Found In Database. Please Try Again." << endl;
+		customersData.close();
+		return;
+	}
+	cout << "Quantity Bought: ";
+	cin >> qtyBought;
+	// process total
+	double total;
+	total = qtyBought * (productPriceMain + (productPriceMain * 0.20));
+
+	filenameBRUH.close();
+
+	// relocation. update value of quantity because you sold an item
+
 	ifstream inFile(filename.c_str()); // Original file
 	ofstream outFile("temp.csv");	   // temporary file but will be permanent file
 
@@ -571,7 +571,7 @@ void addSalesRecord()
 			continue;
 		}
 
-		if (productName == id || productName ==  name)
+		if (productName == id || productName == name)
 		{
 			double currentQty;
 			stringstream(quantity) >> currentQty;
@@ -601,75 +601,80 @@ void addSalesRecord()
 
 	inFile.close();
 	outFile.close();
-	remove(filename.c_str());			  // Remove old file
+	remove(filename.c_str()); // Remove old file
 	rename("temp.csv", filename.c_str());
-	
-	//insert of records
+
+	// insert of records
 	ofstream file("records.txt", ios::app);
-	
-    file <<"=============================="
-	<<endl
-	<<"Customer ID: " << customerID << endl 
-	<<"Name: " << customerName << endl	<< "-----------------------" << endl
-	<<"Product ID: " << productID << endl 
-	<<"Product Name: " << productName << endl
-	<<"Category: " << category << endl 	<< "-----------------------" << endl
-	<<"Quantity Bought: " << qtyBought << endl << "-----------------------" << endl 
-	<< "Total Amount Sold: " << total << endl <<endl;
-    file.close();
-    
-    ofstream anotherFile("totalProfitRecords.csv", ios::app);
-	
-    anotherFile << total << ",";
-	
-    anotherFile.close();
-    
-    cout << "Successfully Inserted the Data!" << endl <<endl;
-}	
+
+	file << "=============================="
+		 << endl
+		 << "Customer ID: " << customerID << endl
+		 << "Name: " << customerName << endl
+		 << "-----------------------" << endl
+		 << "Product ID: " << productID << endl
+		 << "Product Name: " << productName << endl
+		 << "Category: " << category << endl
+		 << "-----------------------" << endl
+		 << "Quantity Bought: " << qtyBought << endl
+		 << "-----------------------" << endl
+		 << "Total Amount Sold: " << total << endl
+		 << endl;
+	file.close();
+
+	ofstream anotherFile("totalProfitRecords.csv", ios::app);
+
+	anotherFile << total << ",";
+
+	anotherFile.close();
+
+	cout << "Successfully Inserted the Data!" << endl
+		 << endl;
+}
 void showSalesReport()
 {
-	//show all records
+	// show all records
 	ifstream file("records.txt");
 	if (!file)
-    {
-        cerr << "Failed to open file." << endl;
-        return;
-    }
+	{
+		cerr << "Failed to open file." << endl;
+		return;
+	}
 
-    string line;
-    while (getline(file, line))
-    {
-        cout << line << endl;
-    }
-    file.close();
-    
-	//total profit
+	string line;
+	while (getline(file, line))
+	{
+		cout << line << endl;
+	}
+	file.close();
+
+	// total profit
 	double total;
 	ifstream anotherfile("totalProfitRecords.csv");
 	{
 		string line;
-    		
-		while (getline(anotherfile, line)) 
-    	{
-        stringstream ss(line);
-        string value;
 
-	        while (getline(ss, value, ','))
-	        {
-	            double num;
-	            stringstream(value) >> num;
-	            //adds total from previous. 
-				//It adds the right-hand operand to the left-hand operand and assigns the result to the left-hand operand. 
-				//same with (total = total + num)
-	            total += num;
-	        }
-    	}
+		while (getline(anotherfile, line))
+		{
+			stringstream ss(line);
+			string value;
+
+			while (getline(ss, value, ','))
+			{
+				double num;
+				stringstream(value) >> num;
+				// adds total from previous.
+				// It adds the right-hand operand to the left-hand operand and assigns the result to the left-hand operand.
+				// same with (total = total + num)
+				total += num;
+			}
+		}
 	}
-	cout << "======================" <<endl
-	<< "| Total Profit: " << total << " |" <<endl
-	<<"======================" << endl << endl;
+	cout << "======================" << endl
+		 << "| Total Profit: " << total << " |" << endl
+		 << "======================" << endl
+		 << endl;
 	anotherfile.close();
-	
 }
 int main()
 {
