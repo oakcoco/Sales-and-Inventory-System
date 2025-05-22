@@ -424,48 +424,42 @@ void delivery()
 }
 void addSalesRecord()
 {
-	//(CHECKLIST)CUSTOMERNAME,PRODUCTNAME 
-	
+	//(CHECKLIST)CUSTOMERNAME,PRODUCTNAME
 	string customerName, productName, customerID, productID, category;
-
-	int qtyBought;
-
+	double qtyBought, productPriceMain;
 	string line;
-	
+
 	bool customerNameTrue = true;
 	ifstream customersData("customers.csv");
-	
-		
-		cin.ignore();
-		cout << "Enter Name or Name ID: ";
-		getline(cin, customerName);
-		
-		getline(customersData, line);
-		while (getline(customersData, line))
+
+	cin.ignore();
+	cout << "Enter Name or Name ID: ";
+	getline(cin, customerName);
+
+	getline(customersData, line);
+	while (getline(customersData, line))
+	{
+		string currentID, currentName;
+		stringstream customerFinder(line);
+
+		getline(customerFinder, currentID, ',');
+		getline(customerFinder, currentName, ',');
+
+		if (customerName == currentName || customerName == currentID)
 		{
-			string currentID, currentName;
-			stringstream customerFinder(line);
-			
-			getline(customerFinder, currentID, ',');
-			getline(customerFinder, currentName, ',');
-			
-			if (customerName == currentName || customerName == currentID)
-			{
-				customerNameTrue = false;
-				customerName = currentName;
-				customerID = currentID;
-				cout << endl;
-				break;
-			}
+			customerNameTrue = false;
+			customerName = currentName;
+			customerID = currentID;
+			cout << endl;
+			break;
 		}
-		if(cutomerNameTrue)
-		{
+	}
+	if (customerNameTrue)
+	{
 		cout << "Not Found In Database. Please Try Again." << endl;
-		
-		customerNameTrue = true;
-		//hey this is your bool!!!^^^^^
+		customersData.close();
 		return;
-		}
+	}
 	customersData.close();
 	int choiceCategory;
 	string filename;
@@ -485,29 +479,81 @@ void addSalesRecord()
 		{
 		case 1:
 			filename = "productFood.csv";
+			category = "Food";
 			break;
 		case 2:
 			filename = "productMedical.csv";
+			category = "Medical";
 			break;
 		case 3:
 			filename = "productLiquior.csv";
+			category = "Liquior";
 			break;
 		default:
 			system("cls");
 			break;
 		}
 	}
-	ifstream filenameBRUH(filename.c_str());
-	string findID = "x", findNAME = "x";
 
+		ifstream filenameBRUH(filename.c_str());
+	
 		cin.ignore();
 		cout << "Enter Product Name or Product ID: ";
 		getline(cin, productName);
+		
+		customerNameTrue = true;
+		// hey your bool is reseted to true!!!^^^^^
+		
+		while (getline(filenameBRUH, line))
+		{
+			stringstream ss(line);
+			string id, name, quantity, soldBy, floorQuantity, dateAdded, productPrice;
 	
+			getline(ss, id, ',');
+			getline(ss, name, ',');
+			getline(ss, quantity, ',');
+			getline(ss, soldBy, ',');
+			getline(ss, floorQuantity, ',');
+			getline(ss, dateAdded, ',');
+			getline(ss, productPrice, ',');
+			
+			if (productName == id || productName == name)
+			{
+				productName = name;
+				productID = id;
+				
+				stringstream temp(productPrice);
+				temp >> productPriceMain;
+
+				customerNameTrue = false;
+				break;
+			}
+		}
+		if (customerNameTrue)
+		{
+			cout << "Not Found In Database. Please Try Again." << endl;
+			customersData.close();
+			return;
+		}
+		cout << "Quantity Bought: ";
+		cin >> qtyBought;
+	//process total
+		double total;
+		total = qtyBought * (productPriceMain + (productPriceMain * 0.20));
+		
+	filenameBRUH.close();		
+	
+	//relocation. update value of quantity because you sold an item
+	
+	ifstream inFile(filename.c_str()); // Original file
+	ofstream outFile("temp.csv");	   // temporary file but will be permanent file
+
+	bool firstLine = true;
+
 	while (getline(inFile, line))
 	{
 		stringstream ss(line);
-		string id, name, quantity, soldBy, floorQuantity, dateAdded, deliveryPPcs;
+		string id, name, quantity, soldBy, floorQuantity, dateAdded, productPrice;
 
 		getline(ss, id, ',');
 		getline(ss, name, ',');
@@ -515,117 +561,204 @@ void addSalesRecord()
 		getline(ss, soldBy, ',');
 		getline(ss, floorQuantity, ',');
 		getline(ss, dateAdded, ',');
-		getline(ss, deliveryPPcs, ',');
-		
-			if (productName == id || customerName == name)
-			{
-				productName = name;
-				productID = id;
-				cout << endl;
-				break;
-			}
-		if(customerNameTrue)
+		getline(ss, productPrice, ',');
+
+		// eto yung 1st line yung class ng item
+		if (firstLine)
 		{
-		customerNameTrue = true;
-		cout << "Not Found In Database. Please Try Again." << endl;
-		return;
+			outFile << line << endl;
+			firstLine = false;
+			continue;
+		}
+
+		if (productName == id || productName ==  name)
+		{
+			double currentQty;
+			stringstream(quantity) >> currentQty;
+			int newQty = currentQty - qtyBought;
+
+			outFile << id
+					<< ","
+					<< name
+					<< ","
+					<< newQty
+					<< ","
+					<< soldBy
+					<< ","
+					<< floorQuantity
+					<< ","
+					<< dateAdded
+					<< ","
+					<< productPrice
+					<< endl;
+		}
+		else
+		{
+			// write unchanged lines from original file
+			outFile << line << endl;
 		}
 	}
-	cout << "Quantity Bought: ";
-	cin >> qtyBoughtqtyBought;
+
+	inFile.close();
+	outFile.close();
+	remove(filename.c_str());			  // Remove old file
+	rename("temp.csv", filename.c_str());
 	
+	//insert of records
+	ofstream file("records.txt", ios::app);
 	
-	void showSalesReport()
+    file <<"=============================="
+	<<endl
+	<<"Customer ID: " << customerID << endl 
+	<<"Name: " << customerName << endl	<< "-----------------------" << endl
+	<<"Product ID: " << productID << endl 
+	<<"Product Name: " << productName << endl
+	<<"Category: " << category << endl 	<< "-----------------------" << endl
+	<<"Quantity Bought: " << qtyBought << endl << "-----------------------" << endl 
+	<< "Total Amount Sold: " << total << endl <<endl;
+    file.close();
+    
+    ofstream anotherFile("totalProfitRecords.csv", ios::app);
+	
+    anotherFile << total << ",";
+	
+    anotherFile.close();
+    
+    cout << "Successfully Inserted the Data!" << endl <<endl;
+}	
+void showSalesReport()
+{
+	//show all records
+	ifstream file("records.txt");
+	if (!file)
+    {
+        cerr << "Failed to open file." << endl;
+        return;
+    }
+
+    string line;
+    while (getline(file, line))
+    {
+        cout << line << endl;
+    }
+    file.close();
+    
+	//total profit
+	double total;
+	ifstream anotherfile("totalProfitRecords.csv");
 	{
+		string line;
+    		
+		while (getline(anotherfile, line)) 
+    	{
+        stringstream ss(line);
+        string value;
+
+	        while (getline(ss, value, ','))
+	        {
+	            double num;
+	            stringstream(value) >> num;
+	            //adds total from previous. 
+				//It adds the right-hand operand to the left-hand operand and assigns the result to the left-hand operand. 
+				//same with (total = total + num)
+	            total += num;
+	        }
+    	}
 	}
-	int main()
+	cout << "======================" <<endl
+	<< "| Total Profit: " << total << " |" <<endl
+	<<"======================" << endl << endl;
+	anotherfile.close();
+	
+}
+int main()
+{
+	int systemChoice;
+	do
 	{
-		int systemChoice;
-		do
+		int systemChoice = 0;
+		cout
+			<< "Sales & Inventory System"
+			<< endl
+			<< endl
+			<< "1. Add Product."
+			<< endl
+			<< "2. Add Customer."
+			<< endl
+			<< "3. Add Delivery."
+			<< endl
+			<< "4. Add Sales."
+			<< endl
+			<< "5. Show Sales Report."
+			<< endl
+			<< "6. Show Inventory Status."
+			<< endl
+			<< "7. Exit."
+			<< endl
+			<< endl
+			<< "Enter Number: ";
+
+		cin >> systemChoice;
+
+		switch (systemChoice)
 		{
-			int systemChoice = 0;
+		case 1:
+			addProduct();
+			break;
+		case 2:
+			addCustomers();
+			break;
+		case 3:
+			delivery();
+			break;
+		case 4:
+			addSalesRecord();
+			break;
+		case 5:
+			showSalesReport();
+			break;
+		case 6:
+			inventoryReport();
+			break;
+
+		case 7:
+			system("cls");
 			cout
-				<< "Sales & Inventory System"
+				<< "Thank You!"
+				<< endl
+				<< "BULACAN AGRICULTURAL STATE UNIVERSITY | INSTITUTE OF COMPUTER STUDIES"
 				<< endl
 				<< endl
-				<< "1. Add Product."
+				<< "Final Project for the course subject Advanced Computer Programming (IT-120)."
 				<< endl
-				<< "2. Add Customer."
-				<< endl
-				<< "3. Add Delivery."
-				<< endl
-				<< "4. Add Sales."
-				<< endl
-				<< "5. Show Sales Report."
-				<< endl
-				<< "6. Show Inventory Status."
-				<< endl
-				<< "7. Exit."
+				<< "Instructor (rank ni maam): Mrs. Maylene V. Samin"
 				<< endl
 				<< endl
-				<< "Enter Number: ";
+				<< "Sales & Inventory System in Real World Application"
+				<< endl
+				<< endl
+				<< "BSIT - 1D"
+				<< endl
+				<< "-Agulto, Elward Ashley"
+				<< endl
+				<< "-Artificio, Nicolo C."
+				<< endl
+				<< "-Cruz, Vince"
+				<< endl
+				<< "-Bernabe, Lowrey Ken Kaede L. "
+				<< endl
+				<< "-Pablo, Francis Andrei M."
+				<< endl
+				<< "-Pengson, Justine Paul"
+				<< endl
+				<< "-Viudez, Raven";
 
-			cin >> systemChoice;
+			return 0;
 
-			switch (systemChoice)
-			{
-			case 1:
-				addProduct();
-				break;
-			case 2:
-				addCustomers();
-				break;
-			case 3:
-				delivery();
-				break;
-			case 4:
-				addSalesRecord();
-				break;
-			case 5:
-				showSalesReport();
-				break;
-			case 6:
-				inventoryReport();
-				break;
+		default:
+			system("cls");
+			break;
+		}
 
-			case 7:
-				system("cls");
-				cout
-					<< "Thank You!"
-					<< endl
-					<< "BULACAN AGRICULTURAL STATE UNIVERSITY | INSTITUTE OF COMPUTER STUDIES"
-					<< endl
-					<< endl
-					<< "Final Project for the course subject Advanced Computer Programming (IT-120)."
-					<< endl
-					<< "Instructor (rank ni maam): Mrs. Maylene V. Samin"
-					<< endl
-					<< endl
-					<< "Sales & Inventory System in Real World Application"
-					<< endl
-					<< endl
-					<< "BSIT - 1D"
-					<< endl
-					<< "-Agulto, Elward Ashley"
-					<< endl
-					<< "-Artificio, Nicolo C."
-					<< endl
-					<< "-Cruz, Vince"
-					<< endl
-					<< "-Bernabe, Lowrey Ken Kaede L. "
-					<< endl
-					<< "-Pablo, Francis Andrei M."
-					<< endl
-					<< "-Pengson, Justine Paul"
-					<< endl
-					<< "-Viudez, Raven";
-
-				return 0;
-
-			default:
-				system("cls");
-				break;
-			}
-
-		} while (!(systemChoice <= 6 && 1 <= systemChoice));
-	}
+	} while (!(systemChoice <= 6 && 1 <= systemChoice));
+}
