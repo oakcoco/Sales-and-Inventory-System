@@ -10,5 +10,5 @@ I don't recommend and promote unethical logics of code in real world platform.As
 
 Play with errors and mistakes. Apply the Lessons.
 
-Credits for my groupmates who helped me develop and present the project in the university.
+Credits to my groupmates who helped me develop and present the project in the university.
 
