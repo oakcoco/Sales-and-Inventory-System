@@ -4,237 +4,6 @@
 #include <sstream>
 #include <stdlib.h>
 using namespace std;
-
-void addCustomers()
-{
-	fstream customersData;
-	customersData.open("customers.csv", ios::app | ios::out);
-
-	string name, userID;
-
-	cout << "Add Customer Data." << endl;
-	cout << "Enter ID: ";
-	cin.ignore();
-	getline(cin, userID);
-	cout << "Enter Name: ";
-	cin.ignore();
-	getline(cin, name);
-	customersData << endl
-				  << userID << "," << name;
-
-	cout << endl
-		 << "Customer Data Added Successfuly!"
-		 << endl;
-
-	customersData.close();
-}
-void inventoryReport()
-{
-	// choices between a single item, all items and the category.
-	int choice, choiceCategory;
-
-	string filename;
-
-	cout << "How would you like to report the inventory? Single Item (1) or All Items (2): ";
-	cin >> choice;
-	cout << endl;
-
-	while (!(choiceCategory == 1 || choiceCategory == 2 || choiceCategory == 3))
-	{
-		cout << "Product Category?"
-			 << endl
-			 << "1.Food"
-			 << endl
-			 << "2.Medical"
-			 << endl
-			 << "3.Liquior"
-			 << endl
-			 << "Enter Category:";
-
-		cin >> choiceCategory;
-
-		switch (choiceCategory)
-		{
-		case 1:
-			filename = "productFood.csv";
-			break;
-		case 2:
-			filename = "productMedical.csv";
-			break;
-		case 3:
-			filename = "productLiquior.csv";
-			break;
-		}
-		cout << endl;
-	}
-
-	//.c_str() is used for older compilers. pwede naman kung variable lang kaso old compiler to eh
-	ifstream filenameBRUH(filename.c_str());
-	string findID = "x", findNAME = "x";
-	do
-	{
-		// Specific item search.
-		if (choice == 1)
-		{
-			int choice1;
-			do
-			{
-				cout << "How would you like to search the item By ID (1) or by Name (2): ";
-				cin >> choice1;
-
-				if (choice1 == 1)
-				{
-					cout << "Enter Item ID: ";
-					cin >> findID;
-				}
-				else if (choice1 == 2)
-				{
-					// sabi ni chatgpt lagyan ko daw nere para maalis daw yung newline itong cin.ignore
-					cin.ignore();
-					cout << "Enter Name: ";
-					getline(cin, findNAME);
-				}
-				else
-				{
-					cout << "Invalid Choice" << endl;
-				}
-			} while (!(choice1 == 1 || choice1 == 2));
-		}
-		bool notFound = true;
-		string lineData;
-		// nag skiskip ng line sa csv file.
-		if (choice == 2)
-		{
-			getline(filenameBRUH, lineData);
-		}
-		while (getline(filenameBRUH, lineData))
-		{
-			stringstream ss(lineData);
-			string id, name, quantity, soldBy, floorQuantityNotification;
-
-			// object,stringvariable,delimiter
-			getline(ss, id, ',');
-			getline(ss, name, ',');
-			getline(ss, quantity, ',');
-			getline(ss, soldBy, ',');
-			getline(ss, floorQuantityNotification, ',');
-
-			if (choice == 2)
-			{
-				notFound = false;
-				cout << endl
-					 << "Item ID: " << id << endl
-					 << "Name: " << name << endl
-					 << "Quantity: " << quantity << endl
-					 << "Sold By: " << soldBy << endl
-					 << "Floor Quantity: " << floorQuantityNotification << endl
-					 << "Should we restock?";
-			}
-			else if (id == findID || name == findNAME)
-			{
-				notFound = false;
-				cout << endl
-					 << "Item ID: " << id << endl
-					 << "Name: " << name << endl
-					 << "Quantity: " << quantity << endl
-					 << "Sold By: " << soldBy << endl
-					 << "Floor Quantity: " << floorQuantityNotification << endl
-					 << "Should we restock?";
-			}
-
-			if (choice == 2)
-			{
-			}
-			else if (!(id == findID || name == findNAME))
-			{
-				// itong continue na to affected yung while loop ng getter ng file
-				continue;
-			}
-			stringstream threshold;
-			// validation for entering weight and pieces
-			if (soldBy == "Weight" || soldBy == "weight")
-			{
-				// conversion of string to double for weighted items
-				double quantityDouble;
-				double floorDouble;
-
-				threshold << quantity;
-				threshold >> quantityDouble;
-
-				threshold.clear(); // resets the value of the temporary holder
-				threshold.str(""); // declared value for no errors
-
-				threshold << floorQuantityNotification;
-				threshold >> floorDouble;
-
-				if (quantityDouble <= floorDouble)
-				{
-					cout << " Yes.";
-				}
-				else
-				{
-					cout << " No.";
-				}
-				threshold.clear(); // resets the value of the temporary holder
-				threshold.str(""); // declared value for no errors
-				if (!notFound && choice == 1)
-				{
-					break;
-				}
-			}
-
-			// conversion of string to integers for items that is sold by pieces (stoi)
-			else if (soldBy == "Pieces" || soldBy == "pieces")
-			{
-				int quantityInt;
-				int floorInt;
-
-				threshold << quantity;
-				threshold >> quantityInt;
-
-				threshold.clear(); // resets the value of the temporary holder
-				threshold.str(""); // declared value for no errors
-
-				threshold << floorQuantityNotification;
-				threshold >> floorInt;
-
-				if (quantityInt <= floorInt)
-				{
-					cout << " Yes.";
-				}
-				else
-				{
-					cout << " No.";
-				}
-
-				threshold.clear(); // resets the value of the temporary holder
-				threshold.str(""); // declared value for no errors
-				if (!notFound && choice == 1)
-				{
-					break;
-				}
-			}
-			else
-			{
-				cout << "Invalid Input of weight and pieces.";
-			}
-
-			if (choice == 2)
-			{
-				cout << endl
-					 << "---------------------------------------";
-			}
-		}
-		if (notFound)
-		{
-			cout << "Not Found in Database.";
-		}
-
-	} while (!(choice == 1 || choice == 2));
-	cout << endl
-		 << endl;
-	filenameBRUH.close();
-}
 void addProduct()
 {
 	// file pointer
@@ -254,16 +23,17 @@ void addProduct()
 
 		cin >> choiceCategory;
 
+		// out is for output and app is for append
 		switch (choiceCategory)
 		{
 		case 1:
-			Product.open("productFood.csv", ios::out | ios::app);
+			Product.open("productFood.csv", ios::app);
 			break;
 		case 2:
-			Product.open("productMedical.csv", ios::out | ios::app);
+			Product.open("productMedical.csv", ios::app);
 			break;
 		case 3:
-			Product.open("productLiquior.csv", ios::out | ios::app);
+			Product.open("productLiquior.csv", ios::app);
 			break;
 		}
 		cout << endl;
@@ -272,7 +42,7 @@ void addProduct()
 	cout << "Enter Product Characteristic."
 		 << endl;
 
-	int i, productID, floorQuantityNotification;
+	int productID, floorQuantityNotification;
 	string name, soldBy, dateAdded;
 	double quantity;
 
@@ -299,11 +69,34 @@ void addProduct()
 			<< dateAdded
 			<< endl;
 
-	cout << "Successfully inserted the data!"
+	cout << endl
+		 << "Successfully inserted the data!"
 		 << endl
 		 << endl;
 
 	Product.close();
+}
+void addCustomers()
+{
+	fstream customersData;
+	customersData.open("customers.csv", ios::out | ios::app);
+
+	string name, userID;
+
+	cout << "Add Customer Data." << endl;
+	cout << "Enter ID: ";
+	cin.ignore();
+	getline(cin, userID);
+	cout << "Enter Name: ";
+	getline(cin, name);
+	customersData << endl
+				  << userID << "," << name;
+
+	cout << endl
+		 << "Customer Data Added Successfuly!"
+		 << endl;
+
+	customersData.close();
 }
 void delivery()
 {
@@ -378,6 +171,7 @@ void delivery()
 
 		if (id == findProductID)
 		{
+			// converter of string to double.
 			double currentQty;
 			stringstream(quantity) >> currentQty;
 			int newQty = currentQty + qtyRecieved;
@@ -675,6 +469,243 @@ void showSalesReport()
 		 << "======================" << endl
 		 << endl;
 	anotherfile.close();
+}
+void inventoryReport()
+{
+	// choices between a single item, all items and the category.
+	int choice, choiceCategory, x;
+	string itemsNeedRestockID[100], itemsNeedRestockName[100];
+	string filename;
+
+	cout << "How would you like to report the inventory? Single Item (1) or All Items (2): ";
+	cin >> choice;
+	cout << endl;
+
+	while (!(choiceCategory == 1 || choiceCategory == 2 || choiceCategory == 3))
+	{
+		cout << "Product Category?"
+			 << endl
+			 << "1.Food"
+			 << endl
+			 << "2.Medical"
+			 << endl
+			 << "3.Liquior"
+			 << endl
+			 << "Enter Category:";
+
+		cin >> choiceCategory;
+
+		switch (choiceCategory)
+		{
+		case 1:
+			filename = "productFood.csv";
+			break;
+		case 2:
+			filename = "productMedical.csv";
+			break;
+		case 3:
+			filename = "productLiquior.csv";
+			break;
+		}
+		cout << endl;
+	}
+
+	//.c_str() is used for older compilers. pwede naman kung variable lang kaso old compiler to eh
+	ifstream filenameBRUH(filename.c_str());
+	string findID = "x", findNAME = "x";
+	do
+	{
+		// Specific item search.
+		if (choice == 1)
+		{
+			int choice1;
+			do
+			{
+				cout << "How would you like to search the item By ID (1) or by Name (2): ";
+				cin >> choice1;
+
+				if (choice1 == 1)
+				{
+					cout << "Enter Item ID: ";
+					cin >> findID;
+				}
+				else if (choice1 == 2)
+				{
+					// sabi ni chatgpt lagyan ko daw nere para maalis daw yung newline itong cin.ignore
+					cin.ignore();
+					cout << "Enter Name: ";
+					getline(cin, findNAME);
+				}
+				else
+				{
+					cout << "Invalid Choice" << endl;
+				}
+			} while (!(choice1 == 1 || choice1 == 2));
+		}
+		bool notFound = true;
+		string lineData;
+		// nag skiskip ng line sa csv file.
+		if (choice == 2)
+		{
+			getline(filenameBRUH, lineData);
+		}
+		while (getline(filenameBRUH, lineData))
+		{
+			stringstream ss(lineData);
+			string id, name, quantity, soldBy, floorQuantityNotification;
+
+			// object,stringvariable,delimiter
+			getline(ss, id, ',');
+			getline(ss, name, ',');
+			getline(ss, quantity, ',');
+			getline(ss, soldBy, ',');
+			getline(ss, floorQuantityNotification, ',');
+
+			if (choice == 2)
+			{
+				notFound = false;
+				cout << endl
+					 << "Item ID: " << id << endl
+					 << "Name: " << name << endl
+					 << "Quantity: " << quantity << endl
+					 << "Sold By: " << soldBy << endl
+					 << "Floor Quantity: " << floorQuantityNotification << endl
+					 << "Should we restock?";
+			}
+			else if (id == findID || name == findNAME)
+			{
+				notFound = false;
+				cout << endl
+					 << "Item ID: " << id << endl
+					 << "Name: " << name << endl
+					 << "Quantity: " << quantity << endl
+					 << "Sold By: " << soldBy << endl
+					 << "Floor Quantity: " << floorQuantityNotification << endl
+					 << "Should we restock?";
+			}
+
+			if (choice == 2)
+			{
+			}
+			else if (!(id == findID || name == findNAME))
+			{
+				// itong continue na to affected yung while loop ng getter ng file
+				continue;
+			}
+			// validation for entering weight and pieces
+			stringstream threshold;
+			if (soldBy == "Weight" || soldBy == "weight")
+			{
+				// conversion of string to double for weighted items
+				double quantityDouble;
+				double floorDouble;
+
+				threshold << quantity;
+				threshold >> quantityDouble;
+
+				threshold.clear(); // resets the value of the temporary holder
+				threshold.str(""); // declared value for no errors
+
+				threshold << floorQuantityNotification;
+				threshold >> floorDouble;
+
+				if (quantityDouble <= floorDouble)
+				{
+					cout << " Yes.";
+					itemsNeedRestockID[x] = id;
+					itemsNeedRestockName[x] = name;
+				}
+				else
+				{
+					cout << " No.";
+				}
+				threshold.clear(); // resets the value of the temporary holder
+				threshold.str(""); // declared value for no errors
+				if (!notFound && choice == 1)
+				{
+					break;
+				}
+			}
+
+			// conversion of string to integers for items that is sold by pieces (stoi)
+			else if (soldBy == "Pieces" || soldBy == "pieces")
+			{
+				int quantityInt;
+				int floorInt;
+
+				threshold << quantity;
+				threshold >> quantityInt;
+
+				threshold.clear(); // resets the value of the temporary holder
+				threshold.str(""); // declared value for no errors
+
+				threshold << floorQuantityNotification;
+				threshold >> floorInt;
+
+				if (quantityInt <= floorInt)
+				{
+					cout << " Yes.";
+					itemsNeedRestockID[x] = id;
+					itemsNeedRestockName[x] = name;
+				}
+				else
+				{
+					cout << " No.";
+				}
+
+				threshold.clear(); // resets the value of the temporary holder
+				threshold.str(""); // declared value for no errors
+				if (!notFound && choice == 1)
+				{
+					break;
+				}
+			}
+			else
+			{
+				cout << " Invalid Input of weight/pieces.";
+			}
+
+			if (choice == 2)
+			{
+				cout << endl
+					 << "---------------------------------------";
+			}
+			// this x++ is for itemrestock string counter
+			x++;
+		}
+		cout << endl
+			 << endl
+			 << "These are the items needed restock:";
+
+		int y = 0;
+		for (x = 0; x < 100; x++)
+		{
+			// this variable y is for counter
+
+			if (itemsNeedRestockName[x].empty())
+			{
+				continue;
+			}
+			y++;
+			cout << endl
+				 << y << ". "
+				 << endl
+				 << "Item ID: " << itemsNeedRestockID[x]
+				 << endl
+				 << "Item Name: " << itemsNeedRestockName[x]
+				 << endl
+				 << "-----------------------"
+				 << endl;
+		}
+		if (notFound)
+		{
+			cout << "Not Found in Database.";
+		}
+
+	} while (!(choice == 1 || choice == 2));
+	cout << endl
+		 << endl;
+	filenameBRUH.close();
 }
 int main()
 {
