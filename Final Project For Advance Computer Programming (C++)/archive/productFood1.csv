@@ -1,0 +1,5 @@
+productID,Name,Quantity,soldBy,floorQuantityNotification,dateAdded,deliveryPricePerPiece,totalPrice
+1001,Cinnamon,24,Pieces,5,,40,
+1002,Hotdog,8,Weight,5,may13,20,
+1003,Rice,9.123,Weight,10,may14,50,
+1004,Chicken,20.341,Weight,12.413,may15,240,

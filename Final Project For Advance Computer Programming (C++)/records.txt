@@ -1,0 +1,39 @@
+All Transaction Records:
+
+
+==============================
+Customer ID: 1001
+Name: Nicolo Artificio
+-----------------------
+Product ID: 1001
+Product Name: Sugar
+Product Type: Food
+Product Sub Type: Condiments
+-----------------------
+Price Per Quantity: 60
+Quantity/kg Bought: 45
+-----------------------
+Total Price: 2700
+Amount Recieved: 5000
+Change: 2300
+-----------------------
+Date: 20/05/2025
+==============================
+==============================
+Customer ID: 1001
+Name: Nicolo Artificio
+-----------------------
+Product ID: 1001
+Product Name: Sugar
+Product Type: Food
+Product Sub Type: Condiments
+-----------------------
+Price Per Quantity: 60
+Quantity/kg Bought: 20
+-----------------------
+Total Price: 1200
+Amount Recieved: 3000
+Change: 1800
+-----------------------
+Date: 29/05/2025
+==============================
